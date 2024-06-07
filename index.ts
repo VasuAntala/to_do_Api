@@ -54,19 +54,13 @@ app.post("/create",verifytoken, async(req, res) => {
             console.log({tokenweb})
         }
     })
-    // var created = JSON.parse(Buffer.from("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-    // .eyJfaWQiOiI2NjYxNGVhNDUyN2JlN2Y3N2E3Njg1NWYiLCJuYW1lIj
-    // oidmFzdSIsImVtYWlsIjoidmFzdTEyMzRAZ21haWwuY29tI
-    // iwicGFzc3dvcmQiOiIkMmIkMTAkSk1sMGpuR0RDb3BiU2pLT
-    // 2dNNDdtT0Nwdjh2cC8xOVNoQ05BeWlGeVd2MGh6M3IzWUZXbU
-    // ciLCJpYXQiOjE3MTc2NzQ2MzMsImV4cCI6MTcxNzY3ODIzM30.
-    // hv2lZchmvCzOPFMza_qmqdXr-rqsswAKsclgCK_vNM0"
-    // .split('.')[1], 'base64').toString());
+ 
 
     var created = JSON.parse(Buffer.from(req.headers.authorization.split('.')[1], 'base64').toString());
     
     
     var createdBy=created._id;
+
 let date = new Date();
 let {title,description,status} = req.body;
  db.collection('todo').insertOne({title,description,status,date,createdBy})
@@ -132,12 +126,44 @@ if(deleteREs.deletedCount){
 }
 })
 
-app.get("/get/:id", async(req, res) => {
+app.get("/get", async(req, res) => {
    
+    
     // const id = new ObjectId(req.params.id);
     // const finduser = await db.collection('todo').find({},{projection:{_id:0,description:1}}).limit(1).toArray();
 
-    const finduser = await db.collection('todo').aggregate([{$project:{_id:0,description:1}}]).limit(2*7).toArray();
+    // const finduser = await db.collection('todo').find({}).toArray();
+
+
+    const finduser = await db.collection('todo').aggregate([
+        {
+            $lookup:
+                {
+                from:"users",
+                localField:"finduser",
+                foreignField:"user",
+                as:"user"}
+        },
+        {
+            $unwind:"$user"
+        },
+        {
+            $project:{
+
+                _id:0,
+                title:1,
+                description:1,
+                status:1,
+                date:1,
+                createdBy:1,
+                user:{
+                    _id:1,
+                    name:1,
+                    email:1
+                }
+            },
+        }
+    ]).toArray();
 
     if(finduser){
         res.send(finduser)
