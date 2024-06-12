@@ -157,17 +157,16 @@ const finduser = await db.collection('todo').aggregate([
                 {
                 from:"users",
                 localField:"finduser",
-                foreignField:"user._id",
-                as:"user"
-            }
+                foreignField:"user",
+                as:"user"}
         },
-        {
-            $unwind:"$user"
-        },
-        {
-            $project:{
+     //   {
+          //  $unwind:"$user"
+     //   },
+    //    {
+     //       $project:{
 
-                _id:1,
+                _id:0,
                 title:1,
                 description:1,
                 status:1,
@@ -179,8 +178,7 @@ const finduser = await db.collection('todo').aggregate([
                     email:1
                 }
             },
-        },
-      
+        }
     ]).toArray();
     
 // console.log(limit)
