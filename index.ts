@@ -139,29 +139,29 @@ app.get("/get", async(req, res) => {
         {
             $lookup:
                 {
-                from:"users",
-                localField:"finduser",
-                foreignField:"user",
+                from:"todo",
+                localField:"todoId",
+                foreignField:"_Id",
                 as:"user"}
         },
-        {
-            $unwind:"$user"
-        },
-        {
-            $project:{
+     //   {
+          //  $unwind:"$user"
+     //   },
+    //    {
+     //       $project:{
 
-                _id:0,
-                title:1,
-                description:1,
-                status:1,
-                date:1,
-                createdBy:1,
-                user:{
-                    _id:1,
-                    name:1,
-                    email:1
-                }
-            },
+  //          _id:0,
+     //           title:1,
+  //              description:1,
+//                status:1,
+   //             date:1,
+   //             createdBy:1,
+   //             user:{
+    //                _id:1,
+            //name:1,
+     //               email:1
+    //            }
+     //       },
         }
     ]).toArray();
 
