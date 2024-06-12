@@ -126,7 +126,7 @@ if(deleteREs.deletedCount){
 }
 })
 
-app.get("/get", async(req, res) => {
+app.get("/getTODO", async(req, res) => {
    
     
     // const id = new ObjectId(req.params.id);
@@ -134,15 +134,32 @@ app.get("/get", async(req, res) => {
 
     // const finduser = await db.collection('todo').find({}).toArray();
 
+    // const limit = parseInt(req.query.limit)||2
+    // const page = parseInt(req.query.page)||1
+// const skip = (page-1)*limit
 
-    const finduser = await db.collection('todo').aggregate([
+
+const finduser = await db.collection('todo').aggregate([
+        {
+            $skip:2
+        },
+        {
+           $limit:2
+        },
+// {
+//     $match:
+//         {
+//             createdBy: new ObjectId(req.query.createdBy)
+//         }
+// },
         {
             $lookup:
                 {
                 from:"users",
                 localField:"finduser",
-                foreignField:"user",
-                as:"user"}
+                foreignField:"user._id",
+                as:"user"
+            }
         },
         {
             $unwind:"$user"
@@ -150,7 +167,7 @@ app.get("/get", async(req, res) => {
         {
             $project:{
 
-                _id:0,
+                _id:1,
                 title:1,
                 description:1,
                 status:1,
@@ -162,9 +179,13 @@ app.get("/get", async(req, res) => {
                     email:1
                 }
             },
-        }
+        },
+      
     ]).toArray();
-
+    
+// console.log(limit)
+// console.log(page)
+    // finduser.length ? console.log(finduser) : console.log("not finduser")
     if(finduser){
         res.send(finduser)
     }
